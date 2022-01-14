@@ -1,0 +1,77 @@
+let searchInputEl = document.getElementById("searchInput");
+let selectDisplayCountEl = document.getElementById("selectDisplayCount");
+let searchResultsEl = document.getElementById("searchResults");
+
+function createAndAppendResult(result) {
+    let {
+        title,
+        imageLink,
+        author
+    } = result;
+
+
+    let searchResultContainer = document.createElement("div");
+    searchResultContainer.classList.add("d-flex", "flex-column");
+    searchResultsEl.appendChild(searchResultContainer);
+
+    let searchResultImage = document.createElement("img");
+    searchResultImage.src = imageLink;
+    searchResultImage.classList.add("search-img-result", "mr-auto");
+    searchResultImage.textContent = title;
+    searchResultContainer.appendChild(searchResultImage);
+
+    let searchResultBookHead = document.createElement("h1");
+    searchResultBookHead.classList.add("search-result-book-head");
+
+    searchResultContainer.appendChild(searchResultBookHead);
+
+    let searchResultBookPara = document.createElement("p");
+    searchResultBookPara.classList.add("search-result-book-para");
+    searchResultBookPara.textContent = author;
+    searchResultContainer.appendChild(searchResultBookPara);
+
+}
+
+
+function displayResult(searchResults) {
+    let searchResultHeading = document.createElement("h1");
+    searchResultHeading.textContent = "Popular Books";
+    searchResultHeading.classList.add("p-3");
+    searchResultsEl.appendChild(searchResultHeading);
+
+    for (let result of searchResults) {
+
+        createAndAppendResult(result);
+    }
+}
+selectDisplayCountEl.addEventListener("change", function(event) {
+    let updatedUrl = event.target.value;
+    console.log(updatedUrl);
+});
+
+function searchbookPage(event) {
+    if (event.key === "Enter") {
+        searchResultsEl.textContent = ''
+        let searchInput = searchInputEl.value;
+        let selectDisplayCount = selectDisplayCountEl.value;
+        console.log(selectDisplayCount);
+        let url = "https://apis.ccbp.in/book-store?title=" + searchInput + "&maxResults=" + selectDisplayCount;
+        console.log(url);
+        let options = {
+            method: "GET",
+        };
+        fetch(url, options)
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(jsonData) {
+                console.log(jsonData)
+                let {
+                    search_results
+                } = jsonData;
+                displayResult(search_results);
+            });
+    }
+}
+
+searchInputEl.addEventListener("keydown", searchbookPage);
